@@ -17,7 +17,8 @@ import 'dart_pad.dart';
 import 'dartservices_client/v1.dart';
 import 'editing/editor.dart';
 import 'elements/elements.dart';
-import 'modules/codemirror_module.dart';
+//import 'modules/codemirror_module.dart';
+import 'modules/comid_module.dart';
 import 'modules/dart_pad_module.dart';
 import 'modules/dartservices_module.dart';
 import 'services/common.dart';
@@ -150,7 +151,8 @@ class Playground {
     //modules.register(new MockDartServicesModule());
     modules.register(new DartServicesModule());
     //modules.register(new AceModule());
-    modules.register(new CodeMirrorModule());
+    //modules.register(new CodeMirrorModule());
+    modules.register(new ComidModule());
 
     return modules.start();
   }
