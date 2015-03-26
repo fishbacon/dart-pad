@@ -1,11 +1,11 @@
 from urlparse import urlparse
-from google.appengine.api import users
-from google.appengine.ext import ndb
+#from google.appengine.api import users
+#from google.appengine.ext import ndb
 import os
 import webapp2
 
-class WhiteListEntry(ndb.Model):
-    emailAddress = ndb.StringProperty()
+#class WhiteListEntry(ndb.Model):
+#    emailAddress = ndb.StringProperty()
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
@@ -77,3 +77,10 @@ def _serve(resp, path):
 app = webapp2.WSGIApplication([
     ('.*', MainHandler)
 ], debug=False)
+
+def main():
+    from paste import httpserver
+    httpserver.serve(app, host='0.0.0.0', port='8080')
+
+if __name__ == '__main__':
+    main()
