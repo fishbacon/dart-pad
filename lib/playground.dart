@@ -194,7 +194,9 @@ class Playground {
     editor.resize();
 
     keys.bind('ctrl-s', _handleSave);
+    keys.bind('ctrl-e', _handleDebug);
     keys.bind('ctrl-enter', _handleRun);
+
     keys.bind('f1', () {
       _toggleDocTab();
       _handleHelp();
@@ -366,6 +368,11 @@ class Playground {
     ga.sendEvent('main', 'save');
     // TODO:
     print('handleSave');
+  }
+
+  void _handleDebug(){
+    editor.cm.setLineNumbers(!editor.cm.getLineNumbers());
+    print('debuggin');
   }
 
   void _handleHelp() {
