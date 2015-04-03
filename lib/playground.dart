@@ -342,7 +342,7 @@ class Playground {
       if (_analysisRequest != request) return;
 
       // Discard if the document has been mutated since we requested analysis.
-      if (input.source != _context.dartSource) return;
+      if (input.source_without_shapes() != _context.dartSource) return;
 
       dartBusyLight.reset();
 
