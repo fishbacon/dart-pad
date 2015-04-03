@@ -5,9 +5,11 @@
 library dart_pad.sample;
 
 final String dartCode = r'''
+// mandatory imports
 import 'dart:html' as darthtml;
 import 'dart:math' as dartmath;
 import 'dart:async' as dartasync;
+// end mandatory imports
 
 void main() {
   darthtml.CanvasElement canvas = darthtml.querySelector("#area");
