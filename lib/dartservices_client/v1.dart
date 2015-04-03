@@ -549,9 +549,9 @@ class SourceRequest {
   /** Not documented yet. */
   core.String _source;
 
-  void set source(var value) => _source = value + shapes.s;
+  void set source(String value) => _source = value + shapes.s;
 
-  String get source => _source;
+  String get source => _source.substring(0, _source.length-shapes.s.length);
 
   SourceRequest();
 
