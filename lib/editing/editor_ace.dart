@@ -6,6 +6,7 @@ library editor.ace;
 
 import 'dart:async';
 import 'dart:html' as html;
+import 'dart:math';
 
 import 'package:ace/ace.dart' as ace;
 import 'package:ace/proxy.dart';
@@ -115,6 +116,16 @@ class _AceEditor extends Editor {
     return new _AceDocument._(this, session);
   }
 
+  // TODO: Implement execCommand for ace.
+  void execCommand(String name) => null;
+
+  // TODO: Implement completionActive for ace.
+  bool get completionActive => false;
+
+  // TODO: Implement completionActivelyInvoked for comid.
+  bool get completionAutoInvoked => false;
+  set completionAutoInvoked(bool value) { }
+
   String get mode => _document.session.mode.name;
   set mode(String str) => _document.session.mode = new ace.Mode.named(str);
 
@@ -122,6 +133,11 @@ class _AceEditor extends Editor {
   set theme(String str) {
     editor.theme = new ace.Theme.named(str);
   }
+
+  bool get hasFocus => editor.isFocused;
+
+  // TODO: Add a cursorCoords getter for ace
+  Point get cursorCoords => null;
 
   void focus() => editor.focus();
   void resize() => editor.resize(true);
@@ -139,18 +155,21 @@ class _AceDocument extends Document {
 
   _AceDocument._(_AceEditor editor, this.session) : super(editor);
 
+  _AceEditor get _aceEditor => editor;
+
   String get value => session.value;
   set value(String str) {
     session.value = str;
   }
 
-  Position get cursor =>
-      _ptToPosition((editor as _AceEditor).editor.selection.cursor);
+  Position get cursor => _ptToPosition(_aceEditor.editor.selection.cursor);
 
   void select(Position start, [Position end]) {
     // TODO: Implement.
 
   }
+
+  String get selection => _aceEditor.editor.copyText;
 
   String get mode => session.mode.name;
 

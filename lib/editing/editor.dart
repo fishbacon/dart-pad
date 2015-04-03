@@ -6,6 +6,7 @@ library editor;
 
 import 'dart:async';
 import 'dart:html' as html;
+import 'dart:math';
 
 abstract class EditorFactory {
   List<String> get modes;
@@ -32,11 +33,36 @@ abstract class Editor {
 
   Document get document;
 
+  /**
+   * Runs the command with the given name on the editor.
+   * Only implemented for codemirror and comid.
+   * Returns null for ace editor.
+   */
+  void execCommand(String name);
+
+  /**
+   * Checks if the completion popup is displayed.
+   * Only implemented for codemirror.
+   * Returns null for ace editor and comid.
+   */
+  bool get completionActive;
+
+  bool completionAutoInvoked;
+
   String get mode;
   set mode(String str);
 
   String get theme;
   set theme(String str);
+
+  /**
+   * Returns the cursor coordinates in pixels.
+   * cursorCoords.x corresponds to left and cursorCoords.y corresponds to top.
+   * Only implemented for codemirror, returns null for ace editor and comid.
+   */
+  Point get cursorCoords;
+
+  bool get hasFocus;
 
   void resize();
   void focus();
@@ -55,6 +81,9 @@ abstract class Document {
   Position get cursor;
 
   void select(Position start, [Position end]);
+
+  /// The currently selected text in the editor.
+  String get selection;
 
   String get mode;
 
@@ -109,7 +138,19 @@ class Position {
 }
 
 abstract class CodeCompleter {
-  Future<List<Completion>> complete(Editor editor);
+  Future<CompletionResult> complete(Editor editor);
+}
+
+class CompletionResult {
+  final List<Completion> completions;
+
+  /// The start offset of the text to be replaced by a completion.
+  final int replaceOffset;
+
+  /// The length of the text to be replaced by a completion.
+  final int replaceLength;
+
+  CompletionResult(this.completions, {this.replaceOffset, this.replaceLength});
 }
 
 class Completion {
@@ -121,7 +162,7 @@ class Completion {
 
   /// The css class type for the completion. This may not be supported by all
   /// completors.
-  final String type;
+  String type;
 
   /// The (optional) offset to display the cursor at after completion. This is
   /// relative to the insertion location, not the absolute position in the file.
@@ -130,4 +171,8 @@ class Completion {
   final int cursorOffset;
 
   Completion(this.value, {this.displayString, this.type, this.cursorOffset});
+
+  bool isSetterAndMatchesGetter(Completion other) =>
+      displayString == other.displayString &&
+      (type == "type-getter" && other.type == "type-setter");
 }

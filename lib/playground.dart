@@ -28,9 +28,9 @@ import 'services/common.dart';
 import 'services/execution_iframe.dart';
 import 'src/ga.dart';
 import 'src/gists.dart';
-import 'src/options.dart';
 import 'src/sample.dart' as sample;
 import 'src/util.dart';
+import 'parameter_popup.dart';
 
 Playground get playground => _playground;
 
@@ -48,7 +48,7 @@ class Playground {
   DivElement get _outputpanel => querySelector('#output');
   IFrameElement get _frame => querySelector('#frame');
   DivElement get _docPanel => querySelector('#documentation');
-  bool get _isCompletionActive => querySelector(".CodeMirror-hint-active") != null;
+  bool get _isCompletionActive => editor.completionActive;
   bool get _isDocPanelOpen => querySelector("#doctab").attributes.containsKey('selected');
 
   DButton runbutton;
@@ -60,6 +60,7 @@ class Playground {
   PlaygroundContext _context;
   Future _analysisRequest;
   Router _router;
+  ParameterPopup paramPopup;
 
   ModuleManager modules = new ModuleManager();
 
@@ -164,6 +165,8 @@ class Playground {
   }
 
   void _initPlayground() {
+    final List cursorKeys = [KeyCode.LEFT, KeyCode.RIGHT, KeyCode.UP, KeyCode.DOWN];
+
     // TODO: Set up some automatic value bindings.
     DSplitter editorSplitter = new DSplitter(querySelector('#editor_split'));
     editorSplitter.onPositionChanged.listen((pos) {
@@ -193,14 +196,28 @@ class Playground {
     editor.resize();
 
     keys.bind('ctrl-s', _handleSave);
+    keys.bind('ctrl-e', _handleDebug);
     keys.bind('ctrl-enter', _handleRun);
+
     keys.bind('f1', () {
       _toggleDocTab();
       _handleHelp();
     });
+
     document.onKeyUp.listen((e) {
-      if (_isCompletionActive || [KeyCode.LEFT,KeyCode.RIGHT,KeyCode.UP,KeyCode.DOWN].contains(e.keyCode)) {
-        _handleHelp();
+      if (_isCompletionActive || cursorKeys.contains(e.keyCode)) _handleHelp();
+
+      // If we're already in completion bail.
+      if (_isCompletionActive) return;
+
+      if (e.keyCode == KeyCode.PERIOD) {
+        editor.execCommand("autocomplete");
+      } else if (options.getValueBool('autopopup_code_completion')) {
+        RegExp exp = new RegExp(r"[A-Z]");
+        if (exp.hasMatch(new String.fromCharCode(e.keyCode))) {
+          editor.completionAutoInvoked = true;
+          editor.execCommand("autocomplete");
+        }
       }
     });
     document.onClick.listen((e) => _handleHelp());
@@ -230,13 +247,12 @@ class Playground {
     _context.onDartReconcile.listen((_) => _performAnalysis());
 
     // Set up development options.
-    options.onOptionChanged.listen((OptionChangedEvent event) {
-      // TODO: handle changes
+    options.registerOption('autopopup_code_completion', 'false');
+    options.registerOption('parameter_popup', 'false');
 
-    });
-    options.registerOption('foo.bar', 'true');
-    options.registerOption('foo.baz', 'qux');
-
+    if (options.getValueBool("parameter_popup")) {
+      paramPopup = new ParameterPopup(dartServices, context, editor);
+    }
     _finishedInit();
   }
 
@@ -275,15 +291,17 @@ class Playground {
 
   void _toggleDocTab() {
     // TODO:(devoncarew): We need a tab component (in lib/elements.dart).
+    ga.sendEvent('view', 'dartdoc');
     _outputpanel.style.display = "none";
     querySelector("#consoletab").attributes.remove('selected');
 
-    _docPanel..style.display = "block";
+    _docPanel.style.display = "block";
     querySelector("#doctab").setAttribute('selected','');
   }
 
   void _toggleConsoleTab() {
-    _docPanel..style.display = "none";
+    ga.sendEvent('view', 'console');
+    _docPanel.style.display = "none";
     querySelector("#doctab").attributes.remove('selected');
 
     _outputpanel.style.display = "block";
@@ -343,9 +361,14 @@ class Playground {
         return new Annotation(issue.kind, issue.message, issue.line,
             start: start, end: end);
       }).toList());
+
+      _updateRunButton(
+          hasErrors: result.issues.any((issue) => issue.kind == 'error'),
+          hasWarnings: result.issues.any((issue) => issue.kind == 'warning'));
     }).catchError((e) {
       _context.dartDocument.setAnnotations([]);
       dartBusyLight.reset();
+      _updateRunButton();
       _logger.severe(e);
     });
   }
@@ -356,8 +379,13 @@ class Playground {
     print('handleSave');
   }
 
+  void _handleDebug(){
+    editor.cm.setLineNumbers(!editor.cm.getLineNumbers());
+    print('debuggin');
+  }
+
   void _handleHelp() {
-    if (context.focusedEditor == 'dart' && _isDocPanelOpen) {
+    if (context.focusedEditor == 'dart' && editor.hasFocus && _isDocPanelOpen && editor.document.selection.isEmpty) {
       ga.sendEvent('main', 'help');
 
       SourceRequest input;
@@ -366,7 +394,7 @@ class Playground {
 
       if (_isCompletionActive) {
         // If the completion popup is open we create a new source as if the
-        // completion popup was chosen and ask for the documentation of that
+        // completion popup was chosen, and ask for the documentation of that
         // source.
         String completionText = querySelector(".CodeMirror-hint-active").text;
         var source = context.dartSource;
@@ -393,15 +421,21 @@ class Playground {
           _docPanel.setInnerHtml("<p>No documentation found.</p>");
         } else {
           final NodeValidatorBuilder _htmlValidator = new NodeValidatorBuilder.common()
-            ..allowElement('a', attributes: ['href']);
+            ..allowElement('a', attributes: ['href'])
+            ..allowElement('img', attributes: ['src']);
           _docPanel.setInnerHtml(markdown.markdownToHtml(
 '''
-**`${result.info['description']}`**\n\n
+# `${result.info['description']}`\n\n
 ${result.info['dartdoc'] != null ? result.info['dartdoc'] + "\n\n" : ""}
 ${result.info['kind'].contains("variable") ? "${result.info['kind']}\n\n" : ""}
 ${result.info['kind'].contains("variable") ? "**Propagated type:** ${result.info["propagatedType"]}\n\n" : ""}
 ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName']}" : ""}\n\n
 ''', inlineSyntaxes: [ new InlineBracketsColon(), new InlineBrackets()]), validator: _htmlValidator);
+
+          _docPanel.querySelectorAll("a").forEach((AnchorElement a)
+              => a.target = "_blank");
+          _docPanel.querySelectorAll("h1").forEach((h)
+              => h.classes.add("type-${result.info["kind"].replaceAll(" ","_")}"));
         }
       });
     }
@@ -491,6 +525,19 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
 
       issuesElement.classes.toggle('showing', issues.isNotEmpty);
     }
+  }
+
+  void _updateRunButton({bool hasErrors: false, bool hasWarnings: false}) {
+    const alertSVGIcon =
+        "M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,"
+        "1 5,3M13,13V7H11V13H13M13,17V15H11V17H13Z";
+
+    var path = runbutton.element.querySelector("path");
+    path.attributes["d"] =
+        (hasErrors || hasWarnings) ? alertSVGIcon : "M8 5v14l11-7z";
+
+    path.parent.classes.toggle("error", hasErrors);
+    path.parent.classes.toggle("warning", hasWarnings && !hasErrors);
   }
 
   void _jumpTo(int line, int charStart, int charLength, {bool focus: false}) {
@@ -601,9 +648,8 @@ class PlaygroundContext extends Context {
   }
 }
 
-// TODO: [someReference] should be converted to for example
-// https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.someReference
 class InlineBracketsColon extends markdown.InlineSyntax {
+
   InlineBracketsColon() : super(r'\[:\s?((?:.|\n)*?)\s?:\]');
 
   String htmlEscape(String text) => HTML_ESCAPE.convert(text);
@@ -616,8 +662,16 @@ class InlineBracketsColon extends markdown.InlineSyntax {
   }
 }
 
+// TODO: [someCodeReference] should be converted to for example
+// https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.someReference
+// for now it gets converted <code>someCodeReference</code>
 class InlineBrackets extends markdown.InlineSyntax {
-  InlineBrackets() : super(r'\[\s?((?:.|\n)*?)\s?\](?!\()');
+
+  // This matches URL text in the documentation, with a negative filter
+  // to detect if it is followed by a URL to prevent e.g.
+  // [text] (http://www.example.com) getting turned into
+  // <code>text</code> (http://www.example.com)
+  InlineBrackets() : super(r'\[\s?((?:.|\n)*?)\s?\](?!\s?\()');
 
   String htmlEscape(String text) => HTML_ESCAPE.convert(text);
 

@@ -6,6 +6,8 @@ library editor.codemirror;
 
 import 'dart:async';
 import 'dart:html' as html;
+import 'dart:js';
+import 'dart:math';
 
 import 'package:codemirror/codemirror.dart' hide Position;
 import 'package:codemirror/codemirror.dart' as pos show Position;
@@ -68,7 +70,12 @@ class CodeMirrorFactory extends EditorFactory {
         'cursorHeight': 0.85,
         //'gutters': [_gutterId],
         'extraKeys': {
-          'Ctrl-Space': 'autocomplete',
+          'Ctrl-Space': (jsEditor) {
+            // TODO: maybe move this to playground ?
+            CodeMirror editor = new CodeMirror.fromJsObject(jsEditor);
+            editor.jsProxy['state']['completionAutoInvoked'] = false;
+            editor.execCommand('autocomplete');
+          },
           'Cmd-/': 'toggleComment',
           'Ctrl-/': 'toggleComment'
         },
@@ -94,29 +101,50 @@ class CodeMirrorFactory extends EditorFactory {
 
   Future<HintResults> _completionHelper(CodeMirror editor,
       CodeCompleter completer, HintsOptions options) {
-    pos.Position position = editor.getCursor();
     _CodeMirrorEditor ed = new _CodeMirrorEditor._(this, editor);
 
-    return completer.complete(ed).then((List<Completion> completions) {
-      List<HintResult> hints = completions.map((Completion completion) {
+    return completer.complete(ed).then((CompletionResult result) {
+      Doc doc = editor.getDoc();
+      pos.Position from =  doc.posFromIndex(result.replaceOffset);
+      pos.Position to = doc.posFromIndex(
+          result.replaceOffset + result.replaceLength);
+      String stringToReplace = doc.getValue().substring(
+          result.replaceOffset, result.replaceOffset + result.replaceLength);
+
+      List<HintResult> hints = result.completions.map((Completion completion) {
         return new HintResult(
             completion.value,
             displayText: completion.displayString,
             className: completion.type,
-            hintApplier: (CodeMirror editor, HintResult hint, pos.Position from, pos.Position to) {
-              editor.getDoc().replaceRange(hint.text, from, to);
+            hintApplier: (CodeMirror editor, HintResult hint, pos.Position from,
+                pos.Position to) {
+              doc.replaceRange(hint.text, from, to);
               if (completion.cursorOffset != null) {
                 int diff = hint.text.length - completion.cursorOffset;
-                editor.getDoc().setCursor(new pos.Position(
+                doc.setCursor(new pos.Position(
                     editor.getCursor().line, editor.getCursor().ch - diff));
               }
+            },
+            hintRenderer: (html.Element element, HintResult hint) {
+              element.innerHtml = completion.displayString.replaceFirst(
+                  stringToReplace,"<em>${stringToReplace}</em>"
+              );
             }
         );
       }).toList();
-      if (hints.length == 0) {
-        hints = [new HintResult("", displayText: "No suggestions", className: "type-no_suggestions")];
+
+      // Only show 'no suggestions' if the completion was explicitly invoked
+      // or if the popup was already active.
+      if (hints.isEmpty
+            && (ed.completionActive
+                  || (!ed.completionActive && !ed.completionAutoInvoked))) {
+        hints = [
+          new HintResult(stringToReplace,
+              displayText: "No suggestions", className: "type-no_suggestions")
+        ];
       }
-      return new HintResults.fromHints(hints, position, position);
+
+      return new HintResults.fromHints(hints, from, to);
     });
   }
 }
@@ -140,11 +168,35 @@ class _CodeMirrorEditor extends Editor {
     return new _CodeMirrorDocument._(this, new Doc(content, mode));
   }
 
+  void execCommand(String name) {
+    cm.execCommand(name);
+  }
+
+  bool get completionActive {
+    if (cm.jsProxy['state']['completionActive'] == null) {
+      return false;
+    } else {
+      return cm.jsProxy['state']['completionActive']['widget'] != null;
+    }
+  }
+
+  bool get completionAutoInvoked
+      => cm.jsProxy['state']['completionAutoInvoked'];
+  set completionAutoInvoked(bool value)
+      => cm.jsProxy['state']['completionAutoInvoked'] = value;
+
   String get mode => cm.getMode();
   set mode(String str) => cm.setMode(str);
 
   String get theme => cm.getTheme();
   set theme(String str) => cm.setTheme(str);
+
+  bool get hasFocus => cm.jsProxy['state']['focused'];
+
+  Point get cursorCoords {
+    JsObject js = cm.call("cursorCoords");
+    return new Point(js["left"], js["top"]);
+  }
 
   void focus() => cm.focus();
   void resize() => cm.refresh();
@@ -191,6 +243,8 @@ class _CodeMirrorDocument extends Document {
     }
   }
 
+  String get selection => doc.getSelection(value);
+
   String get mode => parent.mode;
 
   bool get isClean => doc.isClean();
@@ -221,15 +275,7 @@ class _CodeMirrorDocument extends Document {
 
     int lastLine = -1;
 
-    bool hasError = false;
-    bool hasWarning = false;
-
     for (Annotation an in annotations) {
-      if (an.type == "error") {
-        hasError = true;
-      } else if (an.type == "warning") {
-        hasWarning = true;
-      }
       // Create in-line squiggles.
       doc.markText(_posToPos(an.start), _posToPos(an.end),
           className: 'squiggle-${an.type}', title: an.message);
@@ -250,27 +296,6 @@ class _CodeMirrorDocument extends Document {
 //
 ////      cm.setGutterMarker(an.line - 1, _gutterId,
 ////          _makeMarker(an.type, an.message, an.start, an.end));
-    }
-    _updateRunButton(hasError: hasError, hasWarning: hasWarning);
-  }
-
-  _updateRunButton({bool hasError: false, bool hasWarning: false}) {
-    var path = html.querySelector("#runbutton path");
-    const alertIconString = "M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M13,13V7H11V13H13M13,17V15H11V17H13Z";
-
-    if (hasError) {
-      path.attributes["d"] = alertIconString;
-      path.parent.classes.add("error");
-      path.parent.classes.remove("warning");
-
-    } else if (hasWarning) {
-      path.attributes["d"] = alertIconString;
-      path.parent.classes.add("warning");
-      path.parent.classes.remove("error");
-    } else {
-      path.attributes["d"] = "M8 5v14l11-7z";
-      path.parent.classes.remove("error");
-      path.parent.classes.remove("warning");
     }
   }
 
