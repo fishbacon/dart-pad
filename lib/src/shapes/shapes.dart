@@ -1,1 +1,1 @@
-String s = "String s => \"test\";";
+String s = "String s = \"test\";";
