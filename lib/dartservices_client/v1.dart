@@ -9,6 +9,8 @@ import 'package:_discoveryapis_commons/_discoveryapis_commons.dart' as commons;
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:http/http.dart' as http;
 
+import '../src/shapes/shapes.dart' as shapes;
+
 export 'package:_discoveryapis_commons/_discoveryapis_commons.dart' show
     ApiRequestError, DetailedApiRequestError;
 
@@ -545,8 +547,11 @@ class SourceRequest {
   core.int offset;
 
   /** Not documented yet. */
-  core.String source;
+  core.String _source;
 
+  void set source(var value) => _source = value + shapes.s;
+
+  String get source => _source;
 
   SourceRequest();
 
@@ -570,5 +575,3 @@ class SourceRequest {
     return _json;
   }
 }
-
-
