@@ -3,6 +3,11 @@ const String _shapesLibrarySourceCode =
 // Copyright (c) 2015, <your name>. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+/**
+ * A surface on which to draw shapes.
+ *
+ * Use [addShape] and [addShapes] to add [Shape] objects to the surface and then use [draw] to draw the added shapes.
+ */
 class Surface {
   darthtml.CanvasElement _canvas;
 
@@ -15,46 +20,50 @@ class Surface {
     clearShapes();
   }
 
+  void clearShapes() {
+    _shapes = new List<Shape>();
+  }
+
+  /// Adds a shape on to the surface.
+  void addShape(Shape shape) {
+    _shapes.add(shape);
+  }
+
+  /// Adds shapes on to the surface.
+  void addShapes(List<Shape> shapes) {
+    _shapes.addAll(shapes);
+  }
+
+  /// Returns all shapes on the surface.
+  List<Shape> allShapes() {
+    return _shapes.toList();
+  }
+
+  /// Draws all added shapes on the surface.
   void draw() {
     var rect = _canvas.parent.client;
     width = rect.width;
     height = rect.height;
 
-    requestRedraw();
+    _requestRedraw();
   }
 
-  void requestRedraw() {
-    darthtml.window.requestAnimationFrame(drawToContext);
+  void _requestRedraw() {
+    darthtml.window.requestAnimationFrame(_drawToContext);
   }
 
-  void drawToContext([_]) {
+  void _drawToContext([_]) {
     var context = _canvas.context2D;
-    drawBackground(context);
-    drawShapes(context);
+    _drawBackground(context);
+    _drawShapes(context);
   }
 
-  void drawBackground(darthtml.CanvasRenderingContext2D context) {
+  void _drawBackground(darthtml.CanvasRenderingContext2D context) {
     context.clearRect(0, 0, width, height);
   }
 
-  void drawShapes(darthtml.CanvasRenderingContext2D context) {
+  void _drawShapes(darthtml.CanvasRenderingContext2D context) {
     _shapes.forEach((s) => s.draw(context));
-  }
-
-  void clearShapes() {
-    _shapes = new List<Shape>();
-  }
-
-  void addShape(Shape shape) {
-    _shapes.add(shape);
-  }
-
-  void addShapes(List<Shape> shapes) {
-    _shapes.addAll(shapes);
-  }
-
-  List<Shape> allShapes() {
-    return _shapes.toList();
   }
 }
 
@@ -64,6 +73,7 @@ abstract class Shape {
 
   Shape(this.x, this.y);
 
+  /// Draws this shape on a canvas.
   void draw(darthtml.CanvasRenderingContext2D context);
 
   moveRight(int i) {
@@ -80,13 +90,14 @@ class Diamond extends Shape {
   num height;
   String color;
 
-  Diamond(x, y, this.width, this.height, [color]) : super(x, y) {
+  Diamond(num x, num y, this.width, this.height, [String color]) : super(x, y) {
     if (color == null || color == "")
       this.color = "black";
     else
       this.color = color;
   }
 
+  @override
   void draw(darthtml.CanvasRenderingContext2D context) {
     context..lineWidth = 0.5
            ..fillStyle = this.color
@@ -105,7 +116,7 @@ class Circle extends Shape {
   num radius;
   String color;
 
-  Circle(x, y, this.radius, [color]) : super(x, y) {
+  Circle(num x, num y, this.radius, [String color]) : super(x, y) {
     if (color == null || color == "")
       this.color = "black";
     else
@@ -129,7 +140,7 @@ class Rectangle extends Shape {
   num width;
   String color;
 
-  Rectangle(x, y, this.width, this.height, [color]) : super(x, y) {
+  Rectangle(num x, num y, this.width, this.height, [String color]) : super(x, y) {
     if (color == null || color == "")
       this.color = "black";
     else
@@ -148,24 +159,33 @@ class Rectangle extends Shape {
   }
 }
 
+/**
+ * An [Animation] consits of zero or more [AnimationFrame]s. Each frame consists of a number of [Shape]s.
+ *
+ * - Use [animate] to draw each [AnimationFrame] on [surface] in succession.
+ * - Use [animateForever] to animate indefinitely.
+ */
 class Animation {
   List<AnimationFrame> animationFrames;
   Surface surface;
 
-  Animation(Surface this.surface) {
+  /// [surface] is the [Surface] which the animation is drawn on.
+  Animation(this.surface) {
     animationFrames = new List<AnimationFrame>();
   }
 
+  /// Adds an [AnimationFrame] to the the animation.
   void addAnimationFrame(AnimationFrame animationFrame) {
     animationFrames.add(animationFrame);
   }
 
+  /// Draws each [AnimationFrame]s on [surface] in succession.
   void animate() {
-    Iterator frameIterator = animationFrames.iterator;
+    Iterator<AnimationFrame> frameIterator = animationFrames.iterator;
 
     void drawNextFrame() {
       if (frameIterator.moveNext()) {
-        var frame = frameIterator.current;
+        AnimationFrame frame = frameIterator.current;
         surface.clearShapes();
         surface.addShapes(frame.shapesInFrame);
         surface.draw();
@@ -175,12 +195,13 @@ class Animation {
     drawNextFrame();
   }
 
+  /// Animate indefinitely.
   void animateForever() {
-    Iterator frameIterator = animationFrames.iterator;
+    Iterator<AnimationFrame> frameIterator = animationFrames.iterator;
 
     void drawNextFrame() {
       if (frameIterator.moveNext()) {
-        var frame = frameIterator.current;
+        AnimationFrame frame = frameIterator.current;
         surface.clearShapes();
         surface.addShapes(frame.shapesInFrame);
         surface.draw();
@@ -194,6 +215,9 @@ class Animation {
   }
 }
 
+/**
+ * Each frame consists of a number of [Shape]s.
+ */
 class AnimationFrame {
   List<Shape> shapesInFrame;
 
@@ -216,7 +240,7 @@ const String importsAndStuff =
 """
 library shapes.base;
 
-import 'dart:html';
+import 'dart:html' as darthtml;
 import 'dart:math' as dartmath;
 import 'dart:async' as dartasync;
 """;
