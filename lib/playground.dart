@@ -70,6 +70,7 @@ class Playground {
     _registerTab(querySelector('#darttab'), 'dart');
     _registerTab(querySelector('#htmltab'), 'html');
     _registerTab(querySelector('#csstab'), 'css');
+   _registerTab(querySelector('#viewtab'), 'view');
 
     _registerKeyMaps();
 
@@ -590,6 +591,7 @@ class PlaygroundContext extends Context {
   Document _dartDoc;
   Document _htmlDoc;
   Document _cssDoc;
+  Document _viewDoc;
 
   StreamController _cssDirtyController = new StreamController.broadcast();
   StreamController _dartDirtyController = new StreamController.broadcast();
@@ -604,6 +606,7 @@ class PlaygroundContext extends Context {
     _dartDoc = editor.document;
     _htmlDoc = editor.createDocument(content: '', mode: 'html');
     _cssDoc = editor.createDocument(content: '', mode: 'css');
+    _viewDoc = editor.createDocument(content: 'hello there', mode: 'dart');
 
     _dartDoc.onChange.listen((_) => _dartDirtyController.add(null));
     _htmlDoc.onChange.listen((_) => _htmlDirtyController.add(null));
@@ -631,15 +634,25 @@ class PlaygroundContext extends Context {
     _cssDoc.value = value;
   }
 
+  String get viewSource => _viewDoc.value;
+  set viewSource(String value) {
+    _viewDoc.value = value;
+  }
+
   String get activeMode => editor.mode;
 
   void switchTo(String name) {
+    editor.cm.setOption('readOnly', false);
+
     if (name == 'dart') {
       editor.swapDocument(_dartDoc);
     } else if (name == 'html') {
       editor.swapDocument(_htmlDoc);
     } else if (name == 'css') {
       editor.swapDocument(_cssDoc);
+    } else if (name == 'view') {
+      editor.cm.setOption('readOnly', true);
+      editor.swapDocument(_viewDoc);
     }
 
     editor.focus();
