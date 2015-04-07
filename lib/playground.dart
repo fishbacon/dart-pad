@@ -32,6 +32,8 @@ import 'src/sample.dart' as sample;
 import 'src/util.dart';
 import 'parameter_popup.dart';
 
+import 'additions/files.dart';
+
 Playground get playground => _playground;
 
 Playground _playground;
@@ -68,6 +70,8 @@ class Playground {
     _registerTab(querySelector('#darttab'), 'dart');
     _registerTab(querySelector('#htmltab'), 'html');
     _registerTab(querySelector('#csstab'), 'css');
+
+    _registerKeyMaps();
 
     overlay = new DOverlay(querySelector('#frame_overlay'));
     runbutton = new DButton(querySelector('#runbutton'));
@@ -285,6 +289,33 @@ class Playground {
       _context.switchTo(name);
     });
   }
+
+  void _registerKeyMaps() {
+    var menu = querySelector("#key_map_menu");
+    var key_maps = _getKeyMaps();
+
+    for(var map in key_maps){
+      menu.append(_makeLanguageOption(map));
+    }
+
+    menu.onChange.listen((val){
+          editor.cm.setOption("keyMap", menu.value.toLowerCase());
+        });
+  }
+
+  List<String> _getKeyMaps(){
+    var imported_maps = querySelector("#keymaps");
+    var maps = new List<String>();
+    for(var n in imported_maps.children){
+      maps.add(getSourceFileName(n.src));
+    }
+    return maps;
+  }
+
+  Element _makeLanguageOption(String name) =>
+    new Element.option()
+    ..value = name
+    ..text = name;
 
   List<Element> _getTabElements(Element element) =>
       element.querySelectorAll('a');

@@ -67,6 +67,11 @@
           <li><a id="htmltab"><span>HTML</span></a></li>
           <li><a id="csstab"><span>CSS</span></a></li>
           <div flex></div>
+          <div id="key_map_select">
+            <select id="key_map_menu">
+              <option value="Default">Default</option>
+            </select>
+          </div>
           <div id="dartbusy" class="busylight"></div>
           <div>
             <button type="button" id="runbutton" title="Run (ctrl-enter / ⌘-enter)">
@@ -121,7 +126,12 @@
     </footer>
 
     <script src="packages/codemirror/codemirror.js"></script>
-    <script src="packages/codemirror/keymap/emacs.js"></script>
+
+    <div id="keymaps">
+      <script src="packages/codemirror/keymap/emacs.js"></script>
+      <script src="packages/codemirror/keymap/vim.js"></script>
+    </div>
+
     <script type="application/dart" src="main.dart" async></script>
     <script async>
       function ga(x,y,z) {
