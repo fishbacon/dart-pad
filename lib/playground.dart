@@ -33,6 +33,7 @@ import 'src/util.dart';
 import 'parameter_popup.dart';
 
 import 'additions/files.dart';
+import 'src/shapes/shapes.dart' as shapes;
 
 Playground get playground => _playground;
 
@@ -606,7 +607,8 @@ class PlaygroundContext extends Context {
     _dartDoc = editor.document;
     _htmlDoc = editor.createDocument(content: '', mode: 'html');
     _cssDoc = editor.createDocument(content: '', mode: 'css');
-    _viewDoc = editor.createDocument(content: 'hello there', mode: 'dart');
+    _viewDoc = editor.createDocument(content: shapes.shapesLibrarySourceCode(),
+        mode: 'dart');
 
     _dartDoc.onChange.listen((_) => _dartDirtyController.add(null));
     _htmlDoc.onChange.listen((_) => _htmlDirtyController.add(null));
