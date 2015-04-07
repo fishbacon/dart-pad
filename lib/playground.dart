@@ -32,6 +32,9 @@ import 'src/sample.dart' as sample;
 import 'src/util.dart';
 import 'parameter_popup.dart';
 
+import 'additions/files.dart';
+import 'src/shapes/shapes.dart' as shapes;
+
 Playground get playground => _playground;
 
 Playground _playground;
@@ -68,6 +71,9 @@ class Playground {
     _registerTab(querySelector('#darttab'), 'dart');
     _registerTab(querySelector('#htmltab'), 'html');
     _registerTab(querySelector('#csstab'), 'css');
+   _registerTab(querySelector('#viewtab'), 'view');
+
+    _registerKeyMaps();
 
     overlay = new DOverlay(querySelector('#frame_overlay'));
     runbutton = new DButton(querySelector('#runbutton'));
@@ -285,6 +291,33 @@ class Playground {
       _context.switchTo(name);
     });
   }
+
+  void _registerKeyMaps() {
+    var menu = querySelector("#key_map_menu");
+    var key_maps = _getKeyMaps();
+
+    for(var map in key_maps){
+      menu.append(_makeLanguageOption(map));
+    }
+
+    menu.onChange.listen((val){
+          editor.cm.setOption("keyMap", menu.value.toLowerCase());
+        });
+  }
+
+  List<String> _getKeyMaps(){
+    var imported_maps = querySelector("#keymaps");
+    var maps = new List<String>();
+    for(var n in imported_maps.children){
+      maps.add(getSourceFileName(n.src));
+    }
+    return maps;
+  }
+
+  Element _makeLanguageOption(String name) =>
+    new Element.option()
+    ..value = name
+    ..text = name;
 
   List<Element> _getTabElements(Element element) =>
       element.querySelectorAll('a');
@@ -559,6 +592,7 @@ class PlaygroundContext extends Context {
   Document _dartDoc;
   Document _htmlDoc;
   Document _cssDoc;
+  Document _viewDoc;
 
   StreamController _cssDirtyController = new StreamController.broadcast();
   StreamController _dartDirtyController = new StreamController.broadcast();
@@ -573,6 +607,8 @@ class PlaygroundContext extends Context {
     _dartDoc = editor.document;
     _htmlDoc = editor.createDocument(content: '', mode: 'html');
     _cssDoc = editor.createDocument(content: '', mode: 'css');
+    _viewDoc = editor.createDocument(content: shapes.shapesLibrarySourceCode(),
+        mode: 'dart');
 
     _dartDoc.onChange.listen((_) => _dartDirtyController.add(null));
     _htmlDoc.onChange.listen((_) => _htmlDirtyController.add(null));
@@ -600,15 +636,25 @@ class PlaygroundContext extends Context {
     _cssDoc.value = value;
   }
 
+  String get viewSource => _viewDoc.value;
+  set viewSource(String value) {
+    _viewDoc.value = value;
+  }
+
   String get activeMode => editor.mode;
 
   void switchTo(String name) {
+    editor.cm.setOption('readOnly', false);
+
     if (name == 'dart') {
       editor.swapDocument(_dartDoc);
     } else if (name == 'html') {
       editor.swapDocument(_htmlDoc);
     } else if (name == 'css') {
       editor.swapDocument(_cssDoc);
+    } else if (name == 'view') {
+      editor.cm.setOption('readOnly', true);
+      editor.swapDocument(_viewDoc);
     }
 
     editor.focus();
