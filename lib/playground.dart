@@ -71,7 +71,7 @@ class Playground {
     _registerTab(querySelector('#darttab'), 'dart');
     _registerTab(querySelector('#htmltab'), 'html');
     _registerTab(querySelector('#csstab'), 'css');
-   _registerTab(querySelector('#viewtab'), 'view');
+    _registerTab(querySelector('#viewtab'), 'view');
 
     _registerKeyMaps();
 
@@ -341,6 +341,20 @@ class Playground {
     querySelector("#consoletab").setAttribute('selected','');
   }
 
+  void _toggleViewTab([String name]) {
+    ga.sendEvent('view', 'viewtab');
+    var offset = 0;
+    if(name != null){
+      offset = shapes.locateDefinition(name);
+    }
+
+    querySelector("[selected='']").attributes.remove('selected');
+    querySelector("#viewtab").setAttribute('selected', '');
+    _context.switchTo('view');
+
+    editor.document.select(editor.document.posFromIndex(offset));
+  }
+
   void _handleRun() {
     _toggleConsoleTab();
     ga.sendEvent('main', 'run');
@@ -445,10 +459,13 @@ class Playground {
           ..source = _context.dartSource
           ..offset = offset;
       }
-
       // TODO: Show busy.
       dartServices.document(input).timeout(serviceCallTimeout).then(
           (DocumentResponse result) {
+            //TODO: add a "go to source" if the code is from Shapes.
+            //TODO: write a ctags file so that we can find Shapes.
+            print(result.info);
+
         if (result.info['description'] == null &&
             result.info['dartdoc'] == null) {
           _docPanel.setInnerHtml("<p>No documentation found.</p>");
