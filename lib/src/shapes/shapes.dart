@@ -248,3 +248,19 @@ import 'dart:async' as dartasync;
 String shapesLibrarySourceCode() {
   return _shapesLibrarySourceCode;
 }
+
+int locateDefinition(String name, [String source]){
+  var offset = -1;
+  var function_re = new RegExp(r"\s"+"${name}" + r"\s*\(.*\)\s*\{");
+
+  if(source == null){
+    source = shapesLibrarySourceCode();
+  }
+
+  var m = function_re.firstMatch(source);
+  if(m != null){
+    offset = m.start+1;
+  }
+
+  return offset;
+}
