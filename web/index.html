@@ -64,9 +64,9 @@
       <div class="view" flex three layout vertical>
         <div class="header" layout horizontal wrap>
           <li><a id="darttab" selected class="arrow_box"><span>Dart</span></a></li>
+          <li><a id="viewtab"><span>Source View</span></a></li>
           <li><a id="htmltab"><span>HTML</span></a></li>
           <li><a id="csstab"><span>CSS</span></a></li>
-          <li><a id="viewtab"><span>Source View</span></a></li>
           <div flex></div>
           <div id="key_map_select">
             <select id="key_map_menu">
@@ -133,6 +133,13 @@
       <script src="packages/codemirror/keymap/vim.js"></script>
     </div>
 
+    <div id="addons">
+      <script src="packages/codemirror/addon/search/search.js"></script>
+      <script src="packages/codemirror/addon/search/searchcursor.js"></script>
+      <script src="packages/codemirror/addon/dialog/dialog.js"></script>
+      <link href="packages/codemirror/addon/dialog/dialog.css"
+            rel="stylesheet" media="screen">
+    </div>
     <script type="application/dart" src="main.dart" async></script>
     <script async>
       function ga(x,y,z) {
