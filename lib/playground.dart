@@ -279,7 +279,11 @@ class Playground {
 
     component.onClick.listen((_) {
       if (component.hasAttr('selected')) return;
-
+      if (name == 'dart') {
+        _activateDocTab();
+      } else {
+        _deactivateDocTab();
+      }
       component.setAttr('selected');
 
       _getTabElements(component.element.parent.parent).forEach((c) {
