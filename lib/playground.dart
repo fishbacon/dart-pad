@@ -203,6 +203,7 @@ class Playground {
 
     keys.bind('ctrl-s', _handleSave);
     keys.bind('ctrl-e', _handleDebug);
+    // keys.bind('ctrl-r', _handleRun);
     keys.bind('ctrl-enter', _handleRun);
 
     keys.bind('f1', () {
@@ -322,14 +323,42 @@ class Playground {
   List<Element> _getTabElements(Element element) =>
       element.querySelectorAll('a');
 
+  void _toggleViewTab([String name]) {
+    var offset = 0;
+
+    if(name != null){
+      offset = shapes.locateDefinition(name);
+    }
+
+    ga.sendEvent('view', 'viewtab');
+
+    querySelector("[selected='']").attributes.remove('selected');
+    querySelector("#viewtab").setAttribute('selected', '');
+    _context.switchTo('view');
+
+    editor.document.select(editor.document.posFromIndex(offset));
+  }
+
+  void _toggleDocTabActive(){
+    var dt = querySelector("#doctab[inactive='']");
+
+    if(dt == null){
+      querySelector("#doctab").setAttribute('inactive', '');
+    } else {
+      dt.attributes.remove('inactive');
+    }
+  }
+
   void _toggleDocTab() {
     // TODO:(devoncarew): We need a tab component (in lib/elements.dart).
-    ga.sendEvent('view', 'dartdoc');
-    _outputpanel.style.display = "none";
-    querySelector("#consoletab").attributes.remove('selected');
+    if(querySelector("#doctab [inactive='']") == null){
+      ga.sendEvent('view', 'dartdoc');
+      _outputpanel.style.display = "none";
+      querySelector("#consoletab").attributes.remove('selected');
 
-    _docPanel.style.display = "block";
-    querySelector("#doctab").setAttribute('selected','');
+      _docPanel.style.display = "block";
+      querySelector("#doctab").setAttribute('selected','');
+    }
   }
 
   void _toggleConsoleTab() {
@@ -339,20 +368,6 @@ class Playground {
 
     _outputpanel.style.display = "block";
     querySelector("#consoletab").setAttribute('selected','');
-  }
-
-  void _toggleViewTab([String name]) {
-    ga.sendEvent('view', 'viewtab');
-    var offset = 0;
-    if(name != null){
-      offset = shapes.locateDefinition(name);
-    }
-
-    querySelector("[selected='']").attributes.remove('selected');
-    querySelector("#viewtab").setAttribute('selected', '');
-    _context.switchTo('view');
-
-    editor.document.select(editor.document.posFromIndex(offset));
   }
 
   void _handleRun() {
@@ -427,8 +442,7 @@ class Playground {
   }
 
   void _handleDebug(){
-    editor.cm.setLineNumbers(!editor.cm.getLineNumbers());
-    print('debuggin');
+    _toggleDocTabActive();
   }
 
   void _handleHelp() {
@@ -462,8 +476,7 @@ class Playground {
       // TODO: Show busy.
       dartServices.document(input).timeout(serviceCallTimeout).then(
           (DocumentResponse result) {
-            //TODO: add a "go to source" if the code is from Shapes.
-            //TODO: write a ctags file so that we can find Shapes.
+            //TODO (MF): add a "go to source" if the code is from Shapes.
             print(result.info);
 
         if (result.info['description'] == null &&

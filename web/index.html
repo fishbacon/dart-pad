@@ -33,6 +33,21 @@
       #samples {
         margin-left: 10px;
       }
+
+      a[inactive] {
+        cursor: default;
+        color: #ffd9ef;
+        position: relative;
+      }
+
+      a[inactive]::after {
+        border-bottom: 2px solid #ffd9ef;
+        content: "";
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 50%;
+      }
     </style>
   </head>
 
@@ -68,11 +83,6 @@
           <li><a id="htmltab"><span>HTML</span></a></li>
           <li><a id="csstab"><span>CSS</span></a></li>
           <div flex></div>
-          <div id="key_map_select">
-            <select id="key_map_menu">
-              <option value="Default">Default</option>
-            </select>
-          </div>
           <div id="dartbusy" class="busylight"></div>
           <div>
             <button type="button" id="runbutton" title="Run (ctrl-enter / ⌘-enter)">
@@ -115,6 +125,11 @@
       <div>
         <a href="https://api.dartlang.org/" target="docs">API documentation</a>
       </div>
+      <div id="key_map_select" class="footer-item">
+        <select id="key_map_menu">
+          <option value="Default">Default</option>
+        </select>
+      </div>
       <div flex></div>
       <div>
         <a href="https://github.com/dart-lang/dart-pad/wiki/Privacy-Policy"
@@ -124,6 +139,7 @@
           Send feedback
         </a>
       </div>
+
     </footer>
 
     <script src="packages/codemirror/codemirror.js"></script>
