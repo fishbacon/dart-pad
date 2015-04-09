@@ -332,42 +332,58 @@ class Playground {
 
     ga.sendEvent('view', 'viewtab');
 
-    querySelector("[selected='']").attributes.remove('selected');
+    querySelector("[selected]").attributes.remove('selected');
     querySelector("#viewtab").setAttribute('selected', '');
     _context.switchTo('view');
 
     editor.document.select(editor.document.posFromIndex(offset));
   }
 
+  boolean _isDocTabActive() => querySelector("#doctab[inactive]") == null;
+
+  void _activateDocTab(){
+    if(!_isDocTabActive()) _toggleDocTabActive();
+  }
+
+  void _deactivateDocTab(){
+    if(_isDocTabActive()) _toggleDocTabActive();
+  }
+
   void _toggleDocTabActive(){
-    var dt = querySelector("#doctab[inactive='']");
+    var dt = querySelector("#doctab[inactive]");
 
     if(dt == null){
       querySelector("#doctab").setAttribute('inactive', '');
+      _toggleConsoleTab();
     } else {
       dt.attributes.remove('inactive');
     }
   }
 
   void _toggleDocTab() {
+    var dt = querySelector("#doctab");
     // TODO:(devoncarew): We need a tab component (in lib/elements.dart).
-    if(querySelector("#doctab [inactive='']") == null){
+    if(dt.attributes['selected'] == null
+        && dt.attributes['inactive'] == null){
       ga.sendEvent('view', 'dartdoc');
       _outputpanel.style.display = "none";
       querySelector("#consoletab").attributes.remove('selected');
 
       _docPanel.style.display = "block";
-      querySelector("#doctab").setAttribute('selected','');
+      dt.setAttribute('selected','');
     }
   }
 
   void _toggleConsoleTab() {
-    ga.sendEvent('view', 'console');
-    _docPanel.style.display = "none";
-    querySelector("#doctab").attributes.remove('selected');
+    var ct = querySelector("#consoletab");
+    if(ct.attributes['selected'] == null){
+      ga.sendEvent('view', 'console');
+      _docPanel.style.display = "none";
+      querySelector("#doctab").attributes.remove('selected');
 
-    _outputpanel.style.display = "block";
-    querySelector("#consoletab").setAttribute('selected','');
+      _outputpanel.style.display = "block";
+      ct.setAttribute('selected','');
+    }
   }
 
   void _handleRun() {
@@ -477,8 +493,6 @@ class Playground {
       dartServices.document(input).timeout(serviceCallTimeout).then(
           (DocumentResponse result) {
             //TODO (MF): add a "go to source" if the code is from Shapes.
-            print(result.info);
-
         if (result.info['description'] == null &&
             result.info['dartdoc'] == null) {
           _docPanel.setInnerHtml("<p>No documentation found.</p>");
