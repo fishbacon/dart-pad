@@ -103,10 +103,10 @@ class Diamond extends Shape {
            ..fillStyle = this.color
            ..strokeStyle = this.color
            ..beginPath()
-           ..moveTo(x, y)
-           ..lineTo(x+(width/2), y+(height/2))
-           ..lineTo(x, y+height)
-           ..lineTo(x-(width/2), y+(height/2))
+           ..moveTo(x-(width/2), y)
+           ..lineTo(x, y-(height/2))
+           ..lineTo(x+(width/2), y)
+           ..lineTo(x, y+(height/2))
            ..fill()
            ..closePath();
   }
@@ -153,7 +153,10 @@ class Rectangle extends Shape {
            ..fillStyle = this.color
            ..strokeStyle = this.color
            ..beginPath()
-           ..rect(x, y, width, height)
+           ..moveTo(x-(width/2), y-(height/2))
+           ..lineTo(x+(width/2), y-(height/2))
+           ..lineTo(x+(width/2), y+(height/2))
+           ..lineTo(x-(width/2), y+(height/2))
            ..fill()
            ..closePath();
   }
