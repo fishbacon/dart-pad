@@ -203,7 +203,7 @@ class Playground {
 
     keys.bind('ctrl-s', _handleSave);
     keys.bind('ctrl-e', _handleDebug);
-    // keys.bind('ctrl-r', _handleRun);
+    keys.bind('ctrl-r', _handleRun);
     keys.bind('ctrl-enter', _handleRun);
 
     keys.bind('f1', () {
