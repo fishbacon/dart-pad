@@ -328,13 +328,13 @@ class Playground {
       element.querySelectorAll('a');
 
 
-  void _toggleViewTab([int offset = 0]) {
+  void _getViewTab([int offset = 0]) {
     ga.sendEvent('view', 'viewtab');
 
     querySelector("[selected]").attributes.remove('selected');
     querySelector("#viewtab").setAttribute('selected', '');
     _context.switchTo('view');
-    _toggleDocTabActive();
+    _deactivateDocTab();
     editor.document.select(editor.document.posFromIndex(offset));
   }
 
@@ -457,7 +457,7 @@ class Playground {
   }
 
   void _handleDebug(){
-    _toggleViewTab();
+    _getViewTab();
   }
 
   void _handleHelp() {
@@ -530,7 +530,7 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
               => h.classes.add("type-${result.info["kind"].replaceAll(" ","_")}"));
           if(offset != -1){
             _docPanel.querySelector("#gotodefinition").onClick.listen((_) =>
-                _toggleViewTab(offset));
+                _getViewTab(offset));
           }
 
         }
