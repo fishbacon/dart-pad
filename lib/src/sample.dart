@@ -34,10 +34,7 @@ void main() {
 ''';
 
 final String htmlCode = r'''
-<h2>Dart Sample</h2>
-
-<p id="output">Hello world!<p>
-<canvas id="area" height="400px" width="400px"></canvas>
+<canvas id="area" height="300px" width="400px"></canvas>
 ''';
 
 final String cssCode = r'''
