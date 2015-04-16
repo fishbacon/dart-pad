@@ -327,19 +327,14 @@ class Playground {
   List<Element> _getTabElements(Element element) =>
       element.querySelectorAll('a');
 
-  void _toggleViewTab([String name]) {
-    var offset = 0;
 
-    if(name != null){
-      offset = shapes.locateDefinition(name);
-    }
-
+  void _toggleViewTab([int offset = 0]) {
     ga.sendEvent('view', 'viewtab');
 
     querySelector("[selected]").attributes.remove('selected');
     querySelector("#viewtab").setAttribute('selected', '');
     _context.switchTo('view');
-
+    _toggleDocTabActive();
     editor.document.select(editor.document.posFromIndex(offset));
   }
 
@@ -462,7 +457,7 @@ class Playground {
   }
 
   void _handleDebug(){
-    _toggleDocTabActive();
+    _toggleViewTab();
   }
 
   void _handleHelp() {
@@ -496,7 +491,6 @@ class Playground {
       // TODO: Show busy.
       dartServices.document(input).timeout(serviceCallTimeout).then(
           (DocumentResponse result) {
-            //TODO (MF): add a "go to source" if the code is from Shapes.
         if (result.info['description'] == null &&
             result.info['dartdoc'] == null) {
           _docPanel.setInnerHtml("<p>No documentation found.</p>");
@@ -504,9 +498,26 @@ class Playground {
           final NodeValidatorBuilder _htmlValidator = new NodeValidatorBuilder.common()
             ..allowElement('a', attributes: ['href'])
             ..allowElement('img', attributes: ['src']);
+
+          var gotoDefinition = new Element.tag('a');
+          var lookingFor;
+
+          lookingFor = result.info['name'] != ''
+            ? result.info['name']
+            : result.info['staticType'];
+
+          int offset = shapes.locateDefinition(lookingFor);
+
+          if(offset != -1){
+            gotoDefinition.id = "gotodefinition";
+            gotoDefinition.text = "go to definition";
+          }
+
+          var gotoDefMD = gotoDefinition.outerHtml;
+
           _docPanel.setInnerHtml(markdown.markdownToHtml(
 '''
-# `${result.info['description']}`\n\n
+# `${result.info['description']}`\n${gotoDefMD}\n\n
 ${result.info['dartdoc'] != null ? result.info['dartdoc'] + "\n\n" : ""}
 ${result.info['kind'].contains("variable") ? "${result.info['kind']}\n\n" : ""}
 ${result.info['kind'].contains("variable") ? "**Propagated type:** ${result.info["propagatedType"]}\n\n" : ""}
@@ -517,6 +528,11 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
               => a.target = "_blank");
           _docPanel.querySelectorAll("h1").forEach((h)
               => h.classes.add("type-${result.info["kind"].replaceAll(" ","_")}"));
+          if(offset != -1){
+            _docPanel.querySelector("#gotodefinition").onClick.listen((_) =>
+                _toggleViewTab(offset));
+          }
+
         }
       });
     }
