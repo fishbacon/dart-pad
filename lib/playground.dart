@@ -69,7 +69,7 @@ class Playground {
 
   ModuleManager modules = new ModuleManager();
 
-  var d = new KeysDialog();
+  KeysDialog d;
 
   Playground() {
     _registerTab(querySelector('#darttab'), 'dart');
@@ -101,7 +101,6 @@ class Playground {
     _initModules().then((_) {
       _initPlayground();
     });
-    d.show();
   }
 
   void showHome(RouteEnterEvent event) {
@@ -206,15 +205,16 @@ class Playground {
     _editpanel.children.first.attributes['flex'] = '';
     editor.resize();
 
-    keys.bind('ctrl-s', _handleSave);
-    keys.bind('ctrl-e', _handleDebug);
-    // keys.bind('ctrl-r', _handleRun);
-    keys.bind('ctrl-enter', _handleRun);
+    // keys.bind('ctrl-r', _handleRun, "run");
+    keys.bind(['ctrl-enter'], _handleRun, "run");
 
-    keys.bind('f1', () {
+    keys.bind(['f1'], () {
       _toggleDocTab();
       _handleHelp();
-    });
+    }, "documentation");
+
+    d = new KeysDialog(keys.inverseBindings);
+    d.show();
 
     document.onKeyUp.listen((e) {
       if (_isCompletionActive || cursorKeys.contains(e.keyCode)) _handleHelp();
