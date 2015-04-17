@@ -32,6 +32,8 @@ import 'src/sample.dart' as sample;
 import 'src/util.dart';
 import 'parameter_popup.dart';
 
+import 'dialogs.dart';
+
 import 'additions/files.dart';
 import 'src/shapes/shapes.dart' as shapes;
 
@@ -67,6 +69,8 @@ class Playground {
 
   ModuleManager modules = new ModuleManager();
 
+  var d = new KeysDialog();
+
   Playground() {
     _registerTab(querySelector('#darttab'), 'dart');
     _registerTab(querySelector('#htmltab'), 'html');
@@ -97,6 +101,7 @@ class Playground {
     _initModules().then((_) {
       _initPlayground();
     });
+    d.show();
   }
 
   void showHome(RouteEnterEvent event) {
@@ -203,7 +208,7 @@ class Playground {
 
     keys.bind('ctrl-s', _handleSave);
     keys.bind('ctrl-e', _handleDebug);
-    keys.bind('ctrl-r', _handleRun);
+    // keys.bind('ctrl-r', _handleRun);
     keys.bind('ctrl-enter', _handleRun);
 
     keys.bind('f1', () {
