@@ -205,8 +205,10 @@ class Playground {
     _editpanel.children.first.attributes['flex'] = '';
     editor.resize();
 
-    // keys.bind('ctrl-r', _handleRun, "run");
+
     keys.bind(['ctrl-enter'], _handleRun, "run");
+
+    keys.bind(['ctrl-space'], (){}, "completion");
 
     keys.bind(['f1'], () {
       _toggleDocTab();
