@@ -341,7 +341,6 @@ class DartservicesApi {
       _queryParams["offset"] = ["${offset}"];
     }
 
-
     _url = 'document';
 
     var _response = _requester.request(_url,
@@ -354,6 +353,29 @@ class DartservicesApi {
     return _response.then((data) => new DocumentResponse.fromJson(data));
   }
 
+  async.Future<DocumentResponse> signalViaDocumentGet(core.Map parameters) {
+    var _url = null;
+    var _uploadMedia = null;
+    var _uploadOptions = null;
+    var _downloadOptions = commons.DownloadOptions.Metadata;
+    var _body = null;
+
+    _url = 'document';
+
+    parameters["source"] = "";
+    parameters["offset"] = "0";
+
+    parameters.forEach((k,v) => parameters[k] = [v]);
+
+    var _response = _requester.request(_url,
+                                       "GET",
+                                       body: _body,
+                                       queryParams: parameters,
+                                       uploadOptions: _uploadOptions,
+                                       uploadMedia: _uploadMedia,
+                                       downloadOptions: _downloadOptions);
+    return _response.then((data) => new DocumentResponse.fromJson(data));
+  }
 }
 
 

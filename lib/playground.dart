@@ -40,7 +40,7 @@ import 'src/shapes/shapes.dart' as shapes;
 Playground get playground => _playground;
 
 Playground _playground;
-Analytics ga = new Analytics();
+Analytics ga = new Analytics(dartServices);
 
 Logger _logger = new Logger('dart_pad');
 
@@ -422,13 +422,10 @@ class Playground {
   }
 
   void _handleSubmit(){
-    dartServices.documentGet(source: "", offset: 0)
-      .timeout(serviceCallTimeout).then(
-          (DocumentResponse result) {
-            _displayIssues([new AnalysisIssue()
-              ..kind = "message"
-              ..message = "Your document has been submitted."]);
-          });
+    ga.sendEvent("submit", "dartdoc");
+    _displayIssues([new AnalysisIssue()
+      ..kind = "message"
+      ..message = "Your document has been submitted."]);
   }
 
   void _performAnalysis() {
