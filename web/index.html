@@ -48,6 +48,11 @@
         right: 0;
         top: 50%;
       }
+
+      .issue .issuelabel.message {
+         color: #000000;
+         background-color: #BFEBBF;
+      }
     </style>
   </head>
 
@@ -85,6 +90,8 @@
           <div flex></div>
           <div id="dartbusy" class="busylight"></div>
           <div>
+            <button type="button" id="submitbutton" title="Exercise">Submit</button>
+
             <button type="button" id="runbutton" title="Run (ctrl-enter / ⌘-enter)">
               <svg width="18" height="18" viewBox="0 0 24 24"
                   style="vertical-align: text-bottom;">
@@ -126,7 +133,7 @@
         <a href="https://api.dartlang.org/" target="docs">API documentation</a>
       </div>
       <div id="key_map_select" class="footer-item">
-        <select id="key_map_menu">
+        <select  style="display: none;" id="key_map_menu">
           <option value="Default">Default keybindings</option>
         </select>
       </div>

@@ -57,6 +57,7 @@ class Playground {
   bool get _isDocPanelOpen => querySelector("#doctab").attributes.containsKey('selected');
 
   DButton runbutton;
+  DButton submitbutton;
   DOverlay overlay;
   DBusyLight dartBusyLight;
   DBusyLight cssBusyLight;
@@ -88,6 +89,12 @@ class Playground {
       // pop up when the user hits the run button.
       if (!isMobile()) _context.focus();
     });
+
+    submitbutton= new DButton(querySelector('#submitbutton'));
+    submitbutton.onClick.listen((e) {
+          _handleSubmit();
+    });
+
 
     // TODO: Currently the lights are all shared; we should have one for each
     // type.
@@ -412,6 +419,13 @@ class Playground {
       runbutton.disabled = false;
       overlay.visible = false;
     });
+  }
+
+  void _handleSubmit(){
+    _displayIssues([new AnalysisIssue()
+
+      ..kind = "message"
+      ..message = "Your document has been submitted."]);
   }
 
   void _performAnalysis() {
