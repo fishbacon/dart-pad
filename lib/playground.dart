@@ -422,10 +422,13 @@ class Playground {
   }
 
   void _handleSubmit(){
-    _displayIssues([new AnalysisIssue()
-
-      ..kind = "message"
-      ..message = "Your document has been submitted."]);
+    dartServices.documentGet(source: "", offset: 0)
+      .timeout(serviceCallTimeout).then(
+          (DocumentResponse result) {
+            _displayIssues([new AnalysisIssue()
+              ..kind = "message"
+              ..message = "Your document has been submitted."]);
+          });
   }
 
   void _performAnalysis() {
