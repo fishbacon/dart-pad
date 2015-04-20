@@ -5,6 +5,7 @@
 library dart_pad.ga;
 
 import 'dart:js';
+import 'dart:html';
 
 /**
  * Very lightweight Google Analytics integration. This class depends on having
@@ -12,6 +13,8 @@ import 'dart:js';
  */
 class Analytics {
   Analytics();
+
+  var host = "http://localhost:8000";
 
   bool get isAvailable => _gaFunction != null;
 
@@ -50,6 +53,9 @@ class Analytics {
       List params = [method];
       if (args != null) params.add(new JsObject.jsify(args));
       _gaFunction.apply(params);
+
+      args['method'] = method;
+      HttpRequest.postFormData(host, args);
     }
   }
 
@@ -58,6 +64,10 @@ class Analytics {
       List params = [method, type];
       if (args != null) params.add(new JsObject.jsify(args));
       _gaFunction.apply(params);
+
+      args['method'] = method;
+      args['type'] = type;
+      HttpRequest.postFormData(host, args);
     }
   }
 
