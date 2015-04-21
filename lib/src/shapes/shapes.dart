@@ -16,7 +16,8 @@ class Surface {
 
   List<Shape> _shapes;
 
-  Surface(this._canvas) {
+  Surface() {
+    _canvas = darthtml.querySelector("#area");
     clearShapes();
   }
 
@@ -59,7 +60,25 @@ class Surface {
   }
 
   void _drawBackground(darthtml.CanvasRenderingContext2D context) {
-    context.clearRect(0, 0, width, height);
+    context..clearRect(0, 0, width, height)
+           ..fillStyle = "white"
+           ..fillRect(0,0,400,300)
+           ..strokeStyle = "black"
+           ..setLineDash([2,2]);
+    for (int i = 50; i <= 350; i = i + 50) {
+      context..beginPath()
+             ..moveTo(i, 0)
+             ..lineTo(i, 400)
+             ..stroke()
+             ..closePath();
+    }
+    for (int i = 50; i <= 300; i = i + 50) {
+      context..beginPath()
+             ..moveTo(0, i)
+             ..lineTo(400, i)
+             ..stroke()
+             ..closePath();
+    }
   }
 
   void _drawShapes(darthtml.CanvasRenderingContext2D context) {
@@ -75,6 +94,14 @@ abstract class Shape {
 
   /// Draws this shape on a canvas.
   void draw(darthtml.CanvasRenderingContext2D context);
+
+  void _drawCenterMark(darthtml.CanvasRenderingContext2D context) {
+    context..beginPath()
+           ..fillStyle = "black"
+           ..arc(x, y, 4, 0, dartmath.PI * 2, false)
+           ..fill()
+           ..closePath();
+  }
 
   moveRight(int i) {
     x = x + i;
@@ -109,6 +136,7 @@ class Diamond extends Shape {
            ..lineTo(x, y+(height/2))
            ..fill()
            ..closePath();
+    _drawCenterMark(context);
   }
 }
 
@@ -132,6 +160,7 @@ class Circle extends Shape {
            ..arc(x, y, radius, 0, dartmath.PI * 2, false)
            ..fill()
            ..closePath();
+    _drawCenterMark(context);
   }
 }
 
@@ -159,6 +188,7 @@ class Rectangle extends Shape {
            ..lineTo(x-(width/2), y+(height/2))
            ..fill()
            ..closePath();
+    _drawCenterMark(context);
   }
 }
 
