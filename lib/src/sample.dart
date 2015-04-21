@@ -11,6 +11,26 @@ import 'dart:math' as dartmath;
 import 'dart:async' as dartasync;
 // End of mandatory imports
 
+// Some practical information about classes:
+class PracticalClass{
+  // Underscores mean private, both for methods and fields.
+  // It is not enforced but should be respected.
+  int _i = 99;
+  var _name;
+
+  // getters and setters are regular function but typically defined as
+  // one-liners using the arrow "=>" syntax.
+  set i(int n) => _i = n;
+  int get i => _i;
+  // Both can be called like a field:
+  // practicalInstance.i = 99
+  // practicalInstance.i
+
+  // Constructor writing has a convenient syntax "this" which allows you
+  // to assign directly to a name when constructing.
+  PracticalClass(this._name, int this._i);
+}
+
 main() {
   //
   // This is a short introduction to Dart. Feel free to delete it when
@@ -71,26 +91,12 @@ main() {
   // Finally Dart has string interpolation. Using $NAME or ${STATEMENT}.
   print("${l.join(' ')} and $i is a number.");
 
-}
-
-// Some practical information about classes:
-class PracticalClass{
-  // Underscores mean private, both for methods and fields.
-  // It is not enforced but should be respected.
-  int _i = 99;
-  var _name;
-
-  // getters and setters are regular function but typically defined as
-  // one-liners using the arrow "=>" syntax.
-  set i(int n) => _i = n;
-  int get i => _i;
-  // Both can be called like a field:
-  // practicalInstance.i = 99
-  // practicalInstance.i
-
-  // Constructor writing has a convenient syntax "this" which allows you
-  // to assign directly to a name when constructing.
-  PracticalClass(this._name, int this._i);
+  // You have reached the end of the introduction
+  // Feel free to delete the code above
+  //
+  // You can extend the code below when solving the given tasks
+  darthtml.CanvasElement canvas = darthtml.querySelector("#area");
+  Surface surface = new Surface(canvas);
 }
 ''';
 
