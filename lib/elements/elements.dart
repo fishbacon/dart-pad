@@ -515,7 +515,7 @@ class DTooltip extends DElement {
   }
 
   set tip(Element tip){
-    element.append(tip);
+    element.innerHtml = tip.innerHtml;
 
     if(element != null){
       var found = element.querySelector("#gotodefinition");

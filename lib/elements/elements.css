@@ -358,7 +358,6 @@ button.close:hover {
   max-width: 40em;
 
   opacity: 0;
-  transition: 400ms;
   z-index: 20;
 
   font-size: 11pt;
@@ -417,4 +416,20 @@ button.close:hover {
 
 .tooltip.showing {
   opacity: 1;
+}
+
+#tooltip h1::before, .CodeMirror-hint::before {
+  color: #333;
+  font-weight: bold;
+  font-family: "Courier", monospace;
+  box-sizing: border-box;
+  line-height: 14px;
+  width: 15px;
+  height: 15px;
+  vertical-align: middle;
+  font-size: 12px;
+  display: inline-block;
+  text-align: center;
+  margin: 0 5px 2px 0;
+  border-radius: 50%;
 }
