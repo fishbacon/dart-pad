@@ -508,9 +508,14 @@ class _ElementTextProperty implements Property {
 
 
 class DTooltip extends DElement {
-  DTooltip(Element tip, Point point) : super.tag("div"){
-    element.append(tip);
+  DTooltip(Element element) : super(element){
     element.classes.addAll(['tooltip']);
+
+    element.classes.toggle('showing', false);
+  }
+
+  set tip(Element tip){
+    element.append(tip);
 
     if(element != null){
       var found = element.querySelector("#gotodefinition");
@@ -518,17 +523,16 @@ class DTooltip extends DElement {
         found.remove();
       }
     }
-
-    setAttr('style', 'left: ${point.x}px; top: ${point.y}px;');
-    element.classes.toggle('showing', true);
   }
+  boolean get showing => element.classes.lookup('showing') != null;
+  set showing(boolean s) => element.classes.toggle('showing', s);
+
+  void move(Point point) => setAttr('style', 'left: ${point.x}px; top: ${point.y}px;');
+
+
+  void hide() => showing = false;
 
   void show() {
-    document.body.children.add(element);
-
-    // TODO: figure out timing for displaying.
-    new Timer(new Duration(seconds: 2), () {
-      element.remove();
-    });
+    showing = true;
   }
 }

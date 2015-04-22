@@ -62,6 +62,8 @@ class Playground {
   DBusyLight dartBusyLight;
   DBusyLight cssBusyLight;
   DBusyLight htmlBusyLight;
+  DTooltip tip;
+
   Editor editor;
   PlaygroundContext _context;
   Future _analysisRequest;
@@ -101,6 +103,8 @@ class Playground {
     dartBusyLight = new DBusyLight(querySelector('#dartbusy'));
     cssBusyLight = new DBusyLight(querySelector('#dartbusy'));
     htmlBusyLight = new DBusyLight(querySelector('#dartbusy'));
+
+    tip = new DTooltip(querySelector('#tooltip'));
 
     SelectElement select = querySelector('#samples');
     select.onChange.listen((_) => _handleSelectChanged(select));
@@ -299,7 +303,6 @@ class Playground {
         _deactivateDocTab();
       }
       component.setAttr('selected');
-
       _getTabElements(component.element.parent.parent).forEach((c) {
         if (c != component.element && c.attributes.containsKey('selected')) {
           c.attributes.remove('selected');
@@ -512,7 +515,7 @@ class Playground {
       // TODO: Show busy.
       dartServices.document(input).timeout(serviceCallTimeout).then(
           (DocumentResponse result) {
-            var tip;
+
         if (result.info['description'] == null &&
             result.info['dartdoc'] == null) {
           _docPanel.setInnerHtml("<p>No documentation found.</p>");
@@ -555,7 +558,9 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
                 _getViewTab(offset));
           }
         }
-        tip = new DTooltip(_docPanel.clone(true), editor.cursorCoords);
+
+        tip.move(editor.cursorCoords);
+        tip.tip = _docPanel;
         tip.show();
       });
     }
