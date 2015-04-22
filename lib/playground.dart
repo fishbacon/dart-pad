@@ -223,8 +223,7 @@ class Playground {
     }, "documentation");
 
     d = new KeysDialog(keys.inverseBindings);
-    // d = new DTooltip("<h1>hello world</h1>");
-    // d.show();
+    d.show();
 
     document.onKeyUp.listen((e) {
       if (_isCompletionActive || cursorKeys.contains(e.keyCode)) _handleHelp();
