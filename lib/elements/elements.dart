@@ -505,3 +505,25 @@ class _ElementTextProperty implements Property {
   // TODO:
   Stream get onChanged => null;
 }
+
+
+class DTooltip extends DElement {
+  DTooltip(Element tip, [cursor=200, line=300]) : super.tag("div"){
+    element.append(tip);
+    element.classes.addAll(['tooltip']);
+
+    if(element != null){
+      var found = element.querySelector("#gotodefinition");
+      if(found != null){
+        found.remove();
+      }
+    }
+
+    setAttr('style', 'left: ${line}px; top: ${cursor}px;');
+    element.classes.toggle('showing', true);
+  }
+
+  void show() {
+    document.body.children.add(element);
+  }
+}

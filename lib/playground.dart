@@ -534,6 +534,7 @@ class Playground {
             gotoDefinition.text = "go to definition";
           }
 
+          var tip;
           var gotoDefMD = gotoDefinition.outerHtml;
 
           _docPanel.setInnerHtml(markdown.markdownToHtml(
@@ -553,7 +554,8 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
             _docPanel.querySelector("#gotodefinition").onClick.listen((_) =>
                 _getViewTab(offset));
           }
-
+          tip = new DTooltip(_docPanel.clone(true));
+          tip.show();
         }
       });
     }

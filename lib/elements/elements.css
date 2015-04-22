@@ -344,3 +344,75 @@ button.close:hover {
 [contenteditable]:focus {
   outline: 0 solid transparent;
 }
+
+.tooltip {
+  font-family: 'Roboto', sans-serif;
+  position: absolute;
+  padding: 10px;
+  background-color: #444;
+  border: 1px solid;
+  border-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  box-shadow: rgba(255, 255, 255, 0.1) 0 0 0, rgba(0, 0, 0, 0.4) 0 1px 7px 0;
+
+  opacity: 0;
+  transition: 400ms;
+  z-index: 20;
+
+  font-size: 11pt;
+  line-height: 20px;
+  overflow: auto;
+  overflow-wrap: break-word;
+  margin-top: 0;
+  margin-left: 0;
+}
+
+.tooltip h1 {
+  font-size: 12pt;
+  font-weight: bold;
+  color: #eee;
+}
+
+.tooltip h2, .tooltip strong {
+  font-weight: bold;
+  color: #cdcdcd; /* little bit brigher than normal text*/
+}
+
+.tooltip a {
+  color: #66d9ef;
+}
+
+.tooltip a:hover {
+  color: #66d9ef;
+  text-decoration: underline;
+}
+
+.tooltip a {
+  color: #66d9ef;
+}
+
+.tooltip a:hover {
+  color: #66d9ef;
+  text-decoration: underline;
+}
+
+.tooltip code,
+.parameter-hints code {
+  font-family: 'Inconsolata', monospace;
+  font-size: 12pt;
+}
+
+.tooltip code em {
+  color: #dfaf8f;
+  font-style: normal;
+}
+
+.tooltip code em
+{
+  color: #dfaf8f;
+  font-style: normal;
+}
+
+.tooltip.showing {
+  opacity: 1;
+}
