@@ -16,7 +16,8 @@ class Surface {
 
   List<Shape> _shapes;
 
-  Surface(this._canvas) {
+  Surface() {
+    _canvas = darthtml.querySelector("#area");
     clearShapes();
   }
 
@@ -59,11 +60,39 @@ class Surface {
   }
 
   void _drawBackground(darthtml.CanvasRenderingContext2D context) {
+    context.save();
+
     context.clearRect(0, 0, width, height);
+
+    context..fillStyle = "white"
+           ..fillRect(0, 0, width, height)
+           ..strokeStyle = "black"
+           ..setLineDash([2,2]);
+
+    for (int i = 0; i <= width; i = i + 50) {
+      context..beginPath()
+             ..moveTo(i, 0)
+             ..lineTo(i, height)
+             ..stroke()
+             ..closePath();
+    }
+    for (int i = 0; i <= height; i = i + 50) {
+      context..beginPath()
+             ..moveTo(0, i)
+             ..lineTo(width, i)
+             ..stroke()
+             ..closePath();
+    }
+
+    context.restore();
   }
 
   void _drawShapes(darthtml.CanvasRenderingContext2D context) {
-    _shapes.forEach((s) => s.draw(context));
+    _shapes.forEach((s) {
+      context.save();
+      s.draw(context);
+      context.restore();
+    });
   }
 }
 
@@ -75,6 +104,18 @@ abstract class Shape {
 
   /// Draws this shape on a canvas.
   void draw(darthtml.CanvasRenderingContext2D context);
+
+  void _drawCenterMark(darthtml.CanvasRenderingContext2D context) {
+    context.save();
+
+    context..beginPath()
+           ..fillStyle = "black"
+           ..arc(x, y, 4, 0, dartmath.PI * 2, false)
+           ..fill()
+           ..closePath();
+
+    context.restore();
+  }
 
   moveRight(int i) {
     x = x + i;
@@ -109,6 +150,7 @@ class Diamond extends Shape {
            ..lineTo(x, y+(height/2))
            ..fill()
            ..closePath();
+    _drawCenterMark(context);
   }
 }
 
@@ -132,6 +174,7 @@ class Circle extends Shape {
            ..arc(x, y, radius, 0, dartmath.PI * 2, false)
            ..fill()
            ..closePath();
+    _drawCenterMark(context);
   }
 }
 
@@ -159,6 +202,7 @@ class Rectangle extends Shape {
            ..lineTo(x-(width/2), y+(height/2))
            ..fill()
            ..closePath();
+    _drawCenterMark(context);
   }
 }
 
