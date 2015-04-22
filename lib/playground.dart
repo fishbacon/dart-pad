@@ -223,7 +223,8 @@ class Playground {
     }, "documentation");
 
     d = new KeysDialog(keys.inverseBindings);
-    d.show();
+    // d = new DTooltip("<h1>hello world</h1>");
+    // d.show();
 
     document.onKeyUp.listen((e) {
       if (_isCompletionActive || cursorKeys.contains(e.keyCode)) _handleHelp();
@@ -512,6 +513,7 @@ class Playground {
       // TODO: Show busy.
       dartServices.document(input).timeout(serviceCallTimeout).then(
           (DocumentResponse result) {
+            var tip;
         if (result.info['description'] == null &&
             result.info['dartdoc'] == null) {
           _docPanel.setInnerHtml("<p>No documentation found.</p>");
@@ -534,7 +536,6 @@ class Playground {
             gotoDefinition.text = "go to definition";
           }
 
-          var tip;
           var gotoDefMD = gotoDefinition.outerHtml;
 
           _docPanel.setInnerHtml(markdown.markdownToHtml(
@@ -554,9 +555,9 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
             _docPanel.querySelector("#gotodefinition").onClick.listen((_) =>
                 _getViewTab(offset));
           }
-          tip = new DTooltip(_docPanel.clone(true));
-          tip.show();
         }
+        tip = new DTooltip(_docPanel.clone(true), editor.cursorCoords);
+        tip.show();
       });
     }
   }

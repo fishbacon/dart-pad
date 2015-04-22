@@ -508,7 +508,7 @@ class _ElementTextProperty implements Property {
 
 
 class DTooltip extends DElement {
-  DTooltip(Element tip, [cursor=200, line=300]) : super.tag("div"){
+  DTooltip(Element tip, Point point) : super.tag("div"){
     element.append(tip);
     element.classes.addAll(['tooltip']);
 
@@ -519,11 +519,16 @@ class DTooltip extends DElement {
       }
     }
 
-    setAttr('style', 'left: ${line}px; top: ${cursor}px;');
+    setAttr('style', 'left: ${point.x}px; top: ${point.y}px;');
     element.classes.toggle('showing', true);
   }
 
   void show() {
     document.body.children.add(element);
+
+    // TODO: figure out timing for displaying.
+    new Timer(new Duration(seconds: 2), () {
+      element.remove();
+    });
   }
 }
