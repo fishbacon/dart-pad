@@ -60,29 +60,39 @@ class Surface {
   }
 
   void _drawBackground(darthtml.CanvasRenderingContext2D context) {
-    context..clearRect(0, 0, width, height)
-           ..fillStyle = "white"
-           ..fillRect(0,0,400,300)
+    context.save();
+
+    context.clearRect(0, 0, width, height);
+
+    context..fillStyle = "white"
+           ..fillRect(0, 0, width, height)
            ..strokeStyle = "black"
            ..setLineDash([2,2]);
-    for (int i = 50; i <= 350; i = i + 50) {
+
+    for (int i = 0; i <= width; i = i + 50) {
       context..beginPath()
              ..moveTo(i, 0)
-             ..lineTo(i, 400)
+             ..lineTo(i, height)
              ..stroke()
              ..closePath();
     }
-    for (int i = 50; i <= 300; i = i + 50) {
+    for (int i = 0; i <= height; i = i + 50) {
       context..beginPath()
              ..moveTo(0, i)
-             ..lineTo(400, i)
+             ..lineTo(width, i)
              ..stroke()
              ..closePath();
     }
+
+    context.restore();
   }
 
   void _drawShapes(darthtml.CanvasRenderingContext2D context) {
-    _shapes.forEach((s) => s.draw(context));
+    _shapes.forEach((s) {
+      context.save();
+      s.draw(context);
+      context.restore();
+    });
   }
 }
 
@@ -96,11 +106,15 @@ abstract class Shape {
   void draw(darthtml.CanvasRenderingContext2D context);
 
   void _drawCenterMark(darthtml.CanvasRenderingContext2D context) {
+    context.save();
+
     context..beginPath()
            ..fillStyle = "black"
            ..arc(x, y, 4, 0, dartmath.PI * 2, false)
            ..fill()
            ..closePath();
+
+    context.restore();
   }
 
   moveRight(int i) {
