@@ -729,7 +729,7 @@ class PlaygroundContext extends Context {
   String get activeMode => editor.mode;
 
   void switchTo(String name) {
-    editor.cm.setOption('readOnly', false);
+    editor.cm.setReadOnly(false);
 
     if (name == 'dart') {
       editor.swapDocument(_dartDoc);
@@ -738,7 +738,7 @@ class PlaygroundContext extends Context {
     } else if (name == 'css') {
       editor.swapDocument(_cssDoc);
     } else if (name == 'view') {
-      editor.cm.setOption('readOnly', true);
+      editor.cm.setReadOnly(true, true);
       editor.swapDocument(_viewDoc);
     }
 
