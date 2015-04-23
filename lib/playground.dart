@@ -62,7 +62,7 @@ class Playground {
   DBusyLight dartBusyLight;
   DBusyLight cssBusyLight;
   DBusyLight htmlBusyLight;
-  DTooltip tip;
+  DTooltip tooltip;
 
   Editor editor;
   PlaygroundContext _context;
@@ -104,7 +104,7 @@ class Playground {
     cssBusyLight = new DBusyLight(querySelector('#dartbusy'));
     htmlBusyLight = new DBusyLight(querySelector('#dartbusy'));
 
-    tip = new DTooltip(querySelector('#tooltip'));
+    tooltip = new DTooltip(querySelector('#tooltip'));
 
     SelectElement select = querySelector('#samples');
     select.onChange.listen((_) => _handleSelectChanged(select));
@@ -558,10 +558,21 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
                 _getViewTab(offset));
           }
         }
+        // TODO: this is a hack, checking if we are completing would be better.
+        Element activeHint = querySelector(".CodeMirror-hint-active");
+        Element hints = querySelector(".CodeMirror-hints");
 
-        tip.move(editor.cursorCoords);
-        tip.tip = _docPanel;
-        tip.show();
+        if(activeHint != null){
+          CssRect offset = activeHint.borderEdge;
+
+          print(offset);
+
+          tooltip.moveTo(offset);
+          tooltip.tip = _docPanel;
+          tooltip.show();
+        } else {
+          tooltip.hide();
+        }
       });
     }
   }

@@ -524,11 +524,12 @@ class DTooltip extends DElement {
       }
     }
   }
+
   boolean get showing => element.classes.lookup('showing') != null;
   set showing(boolean s) => element.classes.toggle('showing', s);
 
-  void move(Point point) => setAttr('style', 'left: ${point.x}px; top: ${point.y}px;');
-
+  void moveTo(CssRect point) =>
+    setAttr('style', 'left: ${point.right+20}px; top: ${point.top}px;');
 
   void hide() => showing = false;
 
