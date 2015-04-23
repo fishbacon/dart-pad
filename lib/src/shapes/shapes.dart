@@ -100,6 +100,7 @@ abstract class Shape {
   num x;
   num y;
 
+  /// [x] and [y] refer to the (x,y) coordinates of the center of the shape
   Shape(this.x, this.y);
 
   /// Draws this shape on a canvas.
@@ -131,6 +132,11 @@ class Diamond extends Shape {
   num height;
   String color;
 
+  /**
+   * [x] and [y] refer to the (x,y) coordinates of the center of the shape.
+   * The size of the shape is specified using [width] and [height].
+   * [color] can be a string like "green", "red", "blue" etc.
+   */
   Diamond(num x, num y, this.width, this.height, [String color]) : super(x, y) {
     if (color == null || color == "")
       this.color = "black";
@@ -158,6 +164,11 @@ class Circle extends Shape {
   num radius;
   String color;
 
+  /**
+   * [x] and [y] refer to the (x,y) coordinates of the center of the shape.
+   * Size of the circle is specified using [radius].
+   * [color] can be a string like "green", "red", "blue" etc.
+   */
   Circle(num x, num y, this.radius, [String color]) : super(x, y) {
     if (color == null || color == "")
       this.color = "black";
@@ -183,6 +194,11 @@ class Rectangle extends Shape {
   num width;
   String color;
 
+  /**
+   * [x] and [y] refer to the (x,y) coordinates of the center of the shape.
+   * The size of the shape is specified using [width] and [height].
+   * [color] can be a string like "green", "red", "blue" etc.
+   */
   Rectangle(num x, num y, this.width, this.height, [String color]) : super(x, y) {
     if (color == null || color == "")
       this.color = "black";
