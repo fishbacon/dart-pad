@@ -298,15 +298,25 @@ class AnimationFrame {
 }
 """;
 
-// Unused
-const String importsAndStuff =
+const String _initialCode =
 """
-library shapes.base;
-
+// Mandatory imports
 import 'dart:html' as darthtml;
 import 'dart:math' as dartmath;
 import 'dart:async' as dartasync;
+// End of mandatory imports
+
+main(){
+  Surface surface = new Surface();
+  // Add your code here ...
+  surface.draw();
+}
 """;
+
+
+String shapesInitialCode(){
+  return _initialCode;
+}
 
 String shapesLibrarySourceCode() {
   return _shapesLibrarySourceCode;
