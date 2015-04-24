@@ -82,6 +82,8 @@ class Playground {
 
     _registerKeyMaps();
 
+    _registerSubmitButton();
+
     overlay = new DOverlay(querySelector('#frame_overlay'));
     runbutton = new DButton(querySelector('#runbutton'));
     runbutton.onClick.listen((e) {
@@ -90,11 +92,6 @@ class Playground {
       // On a mobile device, focusing the editing area causes the keyboard to
       // pop up when the user hits the run button.
       if (!isMobile()) _context.focus();
-    });
-
-    submitbutton= new DButton(querySelector('#submitbutton'));
-    submitbutton.onClick.listen((e) {
-          _handleSubmit();
     });
 
 
@@ -292,6 +289,16 @@ class Playground {
     _router.listen();
   }
 
+  void _registerSubmitButton(){
+    submitbutton = new DButton(querySelector('#submitbutton'));
+    submitbutton.text = "start";
+    submitbutton.setAttr("start");
+    submitbutton.onClick.listen((e) {
+          _toggleDocTab();
+          _handleStart();
+    });
+  }
+
   void _registerTab(Element element, String name) {
     DElement component = new DElement(element);
 
@@ -424,6 +431,17 @@ class Playground {
     });
   }
 
+  void _handleStart(){
+    _context.dartSource = shapes.shapesInitialCode();
+    submitbutton.clearAttr("start");
+    submitbutton.setAttr("submit");
+    submitbutton.text = "submit";
+
+    submitbutton.onClick.listen((e) {
+          _handleSubmit();
+    });
+  }
+
   void _handleSubmit(){
     ga.sendEvent("submit", "dartdoc");
     _displayIssues([new AnalysisIssue()
@@ -485,7 +503,10 @@ class Playground {
   }
 
   void _handleHelp() {
-    if (context.focusedEditor == 'dart' && editor.hasFocus && _isDocPanelOpen && editor.document.selection.isEmpty) {
+    if (context.focusedEditor == 'dart'
+        && editor.hasFocus
+        && _isDocPanelOpen
+        && editor.document.selection.isEmpty) {
       ga.sendEvent('main', 'help');
 
       SourceRequest input;
@@ -500,6 +521,7 @@ class Playground {
         var source = context.dartSource;
         int lastSpace = source.substring(0, offset).lastIndexOf(" ") + 1;
         int lastDot = source.substring(0, offset).lastIndexOf(".") + 1;
+
         offset = math.max(lastSpace, lastDot);
         source = _context.dartSource.substring(0, offset) +
             completionText +
@@ -558,18 +580,18 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
                 _getViewTab(offset));
           }
         }
-        // TODO: this is a hack, checking if we are completing would be better.
-        Element activeHint = querySelector(".CodeMirror-hint-active");
-        Element hints = querySelector(".CodeMirror-hints");
 
-        if(activeHint != null){
-          CssRect offset = activeHint.borderEdge;
+        if(_isCompletionActive){
+          var cmh = querySelector(".CodeMirror-hints");
+          CssRect hintRect = cmh.borderEdge;
 
-          print(offset);
+          // TODO: I believe if we could call
+          //       cm.on(COMPLETER, "close", function(){}) this would be great.
 
-          tooltip.moveTo(offset);
+          tooltip.moveTo(hintRect);
           tooltip.tip = _docPanel;
-          tooltip.show();
+          // tooltip.show();
+
         } else {
           tooltip.hide();
         }

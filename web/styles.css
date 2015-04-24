@@ -421,3 +421,7 @@ div.toggle {
   white-space: nowrap;
   display: inline-block;
 }
+
+button[start]{
+    color: #AEA859;
+}
