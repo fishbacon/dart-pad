@@ -90,17 +90,6 @@ main() {
 
   // Finally Dart has string interpolation. Using $NAME or ${STATEMENT}.
   print("${l.join(' ')} and $i is a number.");
-
-  //
-  // You have reached the end of the introduction
-  // Feel free to delete the code above
-  //
-  // You can extend the code below when solving the given tasks
-  //
-
-  Surface surface = new Surface();
-  // Add your code here ...
-  surface.draw();
 }
 ''';
 
