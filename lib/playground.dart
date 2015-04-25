@@ -294,7 +294,7 @@ class Playground {
     submitbutton.text = "start";
     submitbutton.setAttr("start");
     submitbutton.onClick.listen((e) {
-          _toggleDocTab();
+          _activateDocTab();
           _handleStart();
     });
   }
