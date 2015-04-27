@@ -56,7 +56,6 @@ class Analytics {
       _gaFunction.apply(params);
 
       args['method'] = method;
-      _dartServices.signalViaDocumentGet(args);
     }
   }
 
@@ -68,7 +67,6 @@ class Analytics {
 
       args['method'] = method;
       args['type'] = type;
-      _dartServices.signalViaDocumentGet(args);
     }
   }
 

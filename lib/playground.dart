@@ -437,16 +437,21 @@ class Playground {
     submitbutton.setAttr("submit");
     submitbutton.text = "submit";
 
+    dartServices.startGet();
     submitbutton.onClick.listen((e) {
           _handleSubmit();
-    });
+        });
   }
 
   void _handleSubmit(){
+    var input = new SourceRequest()..source = _context.dartSource;
+    Future request = dartServices.submit(input);
     ga.sendEvent("submit", "dartdoc");
-    _displayIssues([new AnalysisIssue()
-      ..kind = "message"
-      ..message = "Your document has been submitted."]);
+    request.then((SubmitResponse response){
+      _displayIssues([new AnalysisIssue()
+        ..kind = "message"
+        ..message = "Your document has been submitted."]);
+    });
   }
 
   void _performAnalysis() {

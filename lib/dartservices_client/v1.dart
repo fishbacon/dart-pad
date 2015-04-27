@@ -353,28 +353,48 @@ class DartservicesApi {
     return _response.then((data) => new DocumentResponse.fromJson(data));
   }
 
-  async.Future<DocumentResponse> signalViaDocumentGet(core.Map parameters) {
+  async.Future<StartResponse> startGet() {
     var _url = null;
+    var _queryParams = new core.Map();
     var _uploadMedia = null;
     var _uploadOptions = null;
     var _downloadOptions = commons.DownloadOptions.Metadata;
     var _body = null;
 
-    _url = 'document';
-
-    parameters["source"] = "";
-    parameters["offset"] = "0";
-
-    parameters.forEach((k,v) => parameters[k] = [v]);
+    _url = 'start';
 
     var _response = _requester.request(_url,
                                        "GET",
                                        body: _body,
-                                       queryParams: parameters,
+                                       queryParams: _queryParams,
                                        uploadOptions: _uploadOptions,
                                        uploadMedia: _uploadMedia,
                                        downloadOptions: _downloadOptions);
-    return _response.then((data) => new DocumentResponse.fromJson(data));
+    return _response.then((data) => new StartResponse.fromJson(data));
+  }
+
+  async.Future<SubmitResponse> submit(SourceRequest request) {
+    var _url = null;
+    var _queryParams = new core.Map();
+    var _uploadMedia = null;
+    var _uploadOptions = null;
+    var _downloadOptions = commons.DownloadOptions.Metadata;
+    var _body = null;
+
+    if (request != null) {
+      _body = convert.JSON.encode((request).toJson());
+    }
+
+    _url = 'submit';
+
+    var _response = _requester.request(_url,
+                                       "POST",
+                                       body: _body,
+                                       queryParams: _queryParams,
+                                       uploadOptions: _uploadOptions,
+                                       uploadMedia: _uploadMedia,
+                                       downloadOptions: _downloadOptions);
+    return _response.then((data) => new SubmitResponse.fromJson(data));
   }
 }
 
@@ -562,6 +582,13 @@ class DocumentResponse {
   }
 }
 
+class StartResponse extends DocumentResponse{
+  StartResponse.fromJson(core.Map _json): super.fromJson(_json);
+}
+
+class SubmitResponse extends DocumentResponse{
+  SubmitResponse.fromJson(core.Map _json): super.fromJson(_json);
+}
 
 /** Not documented yet. */
 class SourceRequest {
