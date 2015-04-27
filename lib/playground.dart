@@ -294,7 +294,7 @@ class Playground {
     submitbutton.text = "start";
     submitbutton.setAttr("start");
     submitbutton.onClick.listen((e) {
-          _activateDocTab();
+          _showDocTab();
           _handleStart();
     });
   }
@@ -601,6 +601,19 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
 
   void _clearOutput() {
     _outputpanel.text = '';
+  }
+
+  void _showDocTab(){
+    var dt = querySelector("#doctab");
+    if(dt.attributes['inactive'] == null){
+      ga.sendEvent('view', 'dartdoc');
+      _outputpanel.style.display = "none";
+      querySelector("#consoletab").attributes.remove('selected');
+
+      _docPanel.style.display = "block";
+      dt.setAttribute('selected','');
+    }
+
   }
 
   void _showOuput(String message, {bool error: false}) {
