@@ -543,10 +543,8 @@ class Playground {
       dartServices.document(input).timeout(serviceCallTimeout).then(
           (DocumentResponse result) {
 
-        if (result.info['description'] == null &&
-            result.info['dartdoc'] == null) {
-          _docPanel.setInnerHtml("<p>No documentation found.</p>");
-        } else {
+        if (result.info['description'] != null &&
+            result.info['dartdoc'] != null) {
           final NodeValidatorBuilder _htmlValidator = new NodeValidatorBuilder.common()
             ..allowElement('a', attributes: ['href'])
             ..allowElement('img', attributes: ['src']);
