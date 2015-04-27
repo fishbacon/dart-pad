@@ -306,6 +306,7 @@ class Playground {
       if (component.hasAttr('selected')) return;
       if (name == 'dart') {
         _activateDocTab();
+        _showDocTab();
       } else {
         _deactivateDocTab();
       }
