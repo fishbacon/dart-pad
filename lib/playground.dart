@@ -589,7 +589,8 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
           }
         }
 
-        if(_isCompletionActive){
+        if(_isCompletionActive
+            && false){
           var cmh = querySelector(".CodeMirror-hints");
           CssRect hintRect = cmh.borderEdge;
 
@@ -598,8 +599,7 @@ ${result.info['libraryName'] != null ? "**Library:** ${result.info['libraryName'
 
           tooltip.moveTo(hintRect);
           tooltip.tip = _docPanel;
-          // tooltip.show();
-
+          tooltip.show();
         } else {
           tooltip.hide();
         }
