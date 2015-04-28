@@ -290,10 +290,12 @@ class Playground {
   }
 
   void _registerSubmitButton(){
+    var sub;
     submitbutton = new DButton(querySelector('#submitbutton'));
     submitbutton.text = "start";
     submitbutton.setAttr("start");
-    submitbutton.onClick.listen((e) {
+    sub = submitbutton.onClick.listen((e) {
+          sub.cancel();
           _showDocTab();
           _handleStart();
     });
@@ -439,6 +441,7 @@ class Playground {
     submitbutton.text = "submit";
 
     dartServices.startGet();
+
     submitbutton.onClick.listen((e) {
           _handleSubmit();
         });
@@ -452,6 +455,7 @@ class Playground {
       _displayIssues([new AnalysisIssue()
         ..kind = "message"
         ..message = "Your document has been submitted."]);
+      _context.dartSource = shapes.shapesInitialCode();
     });
   }
 
